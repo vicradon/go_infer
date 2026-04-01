@@ -1,0 +1,4 @@
+go_infer
+onnxruntime*
+*.onnx
+*.so*
