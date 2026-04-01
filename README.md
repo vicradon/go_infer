@@ -25,3 +25,19 @@ go build
 ```
 ./go_infer --image images/triangle.png --model shape_classifier.onnx 
 ```
+
+Example output
+
+
+```
+Predicted class: triangle (index 0)
+
+Scores:
+  triangle       ███████████████████░ 0.9997
+  quadrilateral  ░░░░░░░░░░░░░░░░░░░░ 0.0001
+  pentagon       ░░░░░░░░░░░░░░░░░░░░ 0.0001
+  hexagon        ░░░░░░░░░░░░░░░░░░░░ 0.0000
+  heptagon       ░░░░░░░░░░░░░░░░░░░░ 0.0000
+  octagon        ░░░░░░░░░░░░░░░░░░░░ 0.0000
+  decagon        ░░░░░░░░░░░░░░░░░░░░ 0.0000
+```
