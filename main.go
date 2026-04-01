@@ -114,25 +114,25 @@ func runONNX(modelPath string, pixels []float32, size int) ([]float32, error) {
 	}
 	defer session.Destroy()
 
+	// Get output dimensions (7 classes for the model)
+	numClasses := int64(7)
+	outputShape := ort.NewShape(1, numClasses)
+	outputTensor, err := ort.NewEmptyTensor[float32](outputShape)
+	if err != nil {
+		return nil, fmt.Errorf("create output tensor: %w", err)
+	}
+	defer outputTensor.Destroy()
+
+	// Run inference
 	inputs := []ort.Value{inputTensor}
-	var outputs []ort.Value
-	outputTensors := session.Run(inputs, outputs)
-	if len(outputTensors) == 0 {
-		return nil, fmt.Errorf("run session: no outputs returned")
-	}
-	defer func() {
-		for _, o := range outputTensors {
-			o.Destroy()
-		}
-	}()
-
-	// Cast the first output to a float32 tensor
-	logitTensor, ok := outputTensors[0].(*ort.Tensor[float32])
-	if !ok {
-		return nil, fmt.Errorf("output tensor is not float32")
+	outputs := []ort.Value{outputTensor}
+	err = session.Run(inputs, outputs)
+	if err != nil {
+		return nil, fmt.Errorf("run session: %w", err)
 	}
 
-	raw := logitTensor.GetData()
+	// Get the output data
+	raw := outputTensor.GetData()
 	result := make([]float32, len(raw))
 	copy(result, raw)
 	return result, nil
