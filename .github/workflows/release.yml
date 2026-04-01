@@ -20,14 +20,19 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Build binaries
+      - name: Install onnxruntime
+        run: |
+          wget https://github.com/microsoft/onnxruntime/releases/download/v1.24.4/onnxruntime-linux-x64-1.24.4.tgz
+          tar -xzf onnxruntime-linux-x64-1.24.4.tgz
+          cp onnxruntime-linux-x64-1.24.4/lib/libonnxruntime.so.1.24.4 .
+          ln -sf libonnxruntime.so.1.24.4 onnxruntime.so
+
+      - name: Build binary
+        env:
+          CGO_ENABLED: "1"
         run: |
           mkdir -p dist
-          GOOS=linux GOARCH=amd64 go build -o dist/go_infer-linux-amd64 .
-          GOOS=linux GOARCH=arm64 go build -o dist/go_infer-linux-arm64 .
-          GOOS=darwin GOARCH=amd64 go build -o dist/go_infer-darwin-amd64 .
-          GOOS=darwin GOARCH=arm64 go build -o dist/go_infer-darwin-arm64 .
-          GOOS=windows GOARCH=amd64 go build -o dist/go_infer-windows-amd64.exe .
+          go build -o dist/go_infer-linux-amd64 .
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
